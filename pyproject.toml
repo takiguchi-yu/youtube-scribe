@@ -1,0 +1,68 @@
+[project]
+name = "youtube-scribe"
+version = "0.1.0"
+description = "YouTube の再生リストから、動画 1 本ごとの学習メモを生成する"
+requires-python = ">=3.13"
+dependencies = [
+    "google-genai>=2.22.0",
+    "pydantic>=2.13.5",
+    "truststore>=0.10.4",
+    "yt-dlp>=2026.8.19",
+]
+
+[project.scripts]
+youtube-scribe = "youtube_scribe:main"
+
+[build-system]
+requires = ["uv_build>=0.11.16,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "mypy>=2.3.1",
+    "pytest>=9.1.1",
+    "ruff>=0.16.6",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = [
+    "E", "W",   # pycodestyle
+    "F",        # pyflakes
+    "I",        # isort
+    "N",        # pep8-naming
+    "UP",       # pyupgrade
+    "B",        # flake8-bugbear
+    "C4",       # flake8-comprehensions
+    "SIM",      # flake8-simplify
+    "PTH",      # flake8-use-pathlib
+    "ARG",      # flake8-unused-arguments
+    "RET",      # flake8-return
+    "ANN",      # flake8-annotations
+    "RUF",
+]
+
+# RUF001-003 は「紛らわしい Unicode」を咎めるが、日本語で書く以上、全角括弧・全角記号は
+# 正常な文字である。ASCII に置き換えると読めなくなるので、これらを許可する。
+allowed-confusables = ["（", "）", "＝", "–", "—", "：", "×"]
+
+[tool.ruff.lint.per-file-ignores]
+# テストでは引数注釈と未使用引数（フィクスチャ）を許す。
+"tests/*" = ["ANN", "ARG"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+warn_unreachable = true
+files = ["src", "tests"]
+
+# yt-dlp は型スタブを配布していない。
+[[tool.mypy.overrides]]
+module = ["yt_dlp.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
