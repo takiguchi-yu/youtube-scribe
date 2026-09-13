@@ -1,0 +1,333 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "youtube-scribe 動画 1 本の処理パイプライン",
+    "output": "docs/diagrams/pipeline.html",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "happy-path",
+        "label": "記事ができるまで",
+        "focus": [
+          "target",
+          "meta",
+          "transcript",
+          "summarize",
+          "frames",
+          "save"
+        ],
+        "note": "対象の解決から記事の保存まで、成功したときだけ通る一本道。"
+      },
+      {
+        "id": "model-switch",
+        "label": "モデルを次へ送る",
+        "focus": [
+          "summarize",
+          "fallback",
+          "exhausted"
+        ],
+        "note": "クォータはモデルごとに独立。使い切るまで同じ動画を送り直す。"
+      },
+      {
+        "id": "stop-signals",
+        "label": "止める合図",
+        "focus": [
+          "transcript",
+          "throttled",
+          "failed",
+          "exhausted"
+        ],
+        "note": "相手に絞られたら全体を止め、それ以外の失敗は 1 本だけ落として次へ進む。"
+      }
+    ],
+    "legend": {
+      "mode": "auto",
+      "entries": {
+        "frontend": {
+          "label": "入口（cli / playlist）"
+        },
+        "backend": {
+          "label": "手元で動かす（yt-dlp / whisper / ffmpeg）"
+        },
+        "security": {
+          "label": "失敗と停止"
+        },
+        "database": {
+          "label": "保存先（articles/）"
+        },
+        "cloud": {
+          "label": "外部モデル（Gemini）"
+        },
+        "external": {
+          "label": "外部 API（YouTube）"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "source",
+      "label": "入力と材料（cli / youtube_api / media / transcript）"
+    },
+    {
+      "id": "build",
+      "label": "記事にする（summary / frame / article / store）"
+    },
+    {
+      "id": "stop",
+      "label": "例外（モデル切り替え・失敗・停止）",
+      "variant": "exception"
+    }
+  ],
+  "phases": [
+    {
+      "id": "target",
+      "label": "対象を決める",
+      "fromCol": 0,
+      "toCol": 0
+    },
+    {
+      "id": "gather",
+      "label": "材料を集める",
+      "fromCol": 1,
+      "toCol": 2,
+      "variant": "emphasis"
+    },
+    {
+      "id": "publish",
+      "label": "記事にする",
+      "fromCol": 3,
+      "toCol": 5
+    }
+  ],
+  "mainPath": [
+    "target",
+    "meta",
+    "transcript",
+    "summarize",
+    "frames",
+    "save"
+  ],
+  "semanticChecks": {
+    "allowedRoots": [
+      "target"
+    ],
+    "allowedTerminals": [
+      "save",
+      "throttled",
+      "failed",
+      "exhausted"
+    ],
+    "requiredEdges": [
+      {
+        "from": "fallback",
+        "to": "summarize"
+      },
+      {
+        "from": "transcript",
+        "to": "throttled"
+      }
+    ],
+    "requiredPaths": [
+      {
+        "from": "target",
+        "to": "save"
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "id": "target",
+      "lane": "source",
+      "col": 0,
+      "type": "frontend",
+      "width": 143,
+      "label": "対象を決める",
+      "sublabel": "再生リスト → 動画ID の並び",
+      "tag": "記事があれば飛ばす"
+    },
+    {
+      "id": "meta",
+      "lane": "source",
+      "col": 1,
+      "type": "external",
+      "width": 155,
+      "label": "動画メタデータ",
+      "sublabel": "題名・尺・チャプター",
+      "tag": "YouTube Data API",
+      "brand": "youtube"
+    },
+    {
+      "id": "transcript",
+      "lane": "source",
+      "col": 2,
+      "type": "backend",
+      "width": 151,
+      "label": "書き起こしを取る",
+      "sublabel": "人手字幕→自動字幕→文字起こし",
+      "tag": "yt-dlp / whisper-cli"
+    },
+    {
+      "id": "summarize",
+      "lane": "build",
+      "col": 3,
+      "type": "cloud",
+      "width": 134,
+      "label": "要約する",
+      "sublabel": "要点・節・用語・撮る時刻",
+      "tag": "store=False",
+      "brand": "google-gemini"
+    },
+    {
+      "id": "frames",
+      "lane": "build",
+      "col": 4,
+      "type": "backend",
+      "width": 143,
+      "label": "画面キャプチャ",
+      "sublabel": "要約が決めた時刻を切り出す",
+      "tag": "ffmpeg -ss は -i の前"
+    },
+    {
+      "id": "save",
+      "lane": "build",
+      "col": 5,
+      "type": "database",
+      "width": 128,
+      "label": "記事を書く",
+      "sublabel": "一時ファイル → replace",
+      "tag": "存在＝処理済みの印"
+    },
+    {
+      "id": "throttled",
+      "lane": "stop",
+      "col": 1,
+      "type": "security",
+      "width": 136,
+      "label": "全体を止める",
+      "sublabel": "YouTube に絞られた（429）"
+    },
+    {
+      "id": "failed",
+      "lane": "stop",
+      "col": 2,
+      "type": "security",
+      "width": 126,
+      "label": "この 1 本を落とす",
+      "sublabel": "画像を捨て、次の動画へ"
+    },
+    {
+      "id": "fallback",
+      "lane": "stop",
+      "col": 4,
+      "type": "cloud",
+      "width": 143,
+      "label": "次のモデルへ",
+      "sublabel": "クォータはモデルごとに独立"
+    },
+    {
+      "id": "exhausted",
+      "lane": "stop",
+      "col": 5,
+      "type": "security",
+      "width": 118,
+      "label": "全体を止める",
+      "sublabel": "試せるモデルが尽きた"
+    }
+  ],
+  "edges": [
+    {
+      "from": "target",
+      "to": "meta",
+      "label": "記事の無い動画だけ",
+      "variant": "emphasis"
+    },
+    {
+      "from": "meta",
+      "to": "transcript",
+      "label": "動画 URL",
+      "variant": "emphasis"
+    },
+    {
+      "from": "transcript",
+      "to": "summarize",
+      "label": "本文＋チャプター",
+      "variant": "emphasis"
+    },
+    {
+      "from": "summarize",
+      "to": "frames",
+      "label": "根拠の時刻",
+      "variant": "emphasis"
+    },
+    {
+      "from": "frames",
+      "to": "save"
+    },
+    {
+      "from": "transcript",
+      "to": "throttled",
+      "label": "文字起こしへ落とさない",
+      "variant": "security",
+      "role": "error"
+    },
+    {
+      "from": "summarize",
+      "to": "failed",
+      "label": "要約に失敗",
+      "variant": "security",
+      "role": "error"
+    },
+    {
+      "from": "summarize",
+      "to": "fallback",
+      "label": "429 / 5xx",
+      "variant": "security",
+      "role": "error"
+    },
+    {
+      "from": "fallback",
+      "to": "summarize",
+      "label": "同じ動画を次のモデルで",
+      "variant": "dashed",
+      "role": "return"
+    },
+    {
+      "from": "fallback",
+      "to": "exhausted",
+      "label": "残りは試さない",
+      "variant": "security",
+      "role": "error"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "守る不変条件",
+      "items": [
+        "記事ファイルが存在する ＝ その動画の処理は成功している",
+        "失敗したら記事を書かない。画像も捨てる（store.discard_assets）",
+        "書き込みは一時ファイル経由で、最後に replace する（store.save）"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "止める合図",
+      "items": [
+        "429 と 5xx は summary.ModelUnavailableError にまとめ、モデルを次へ送る",
+        "transcript.ThrottledError はその場で全体を止める",
+        "字幕も文字起こしも取れない動画は、1 本だけ落として次へ進む"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "実測にもとづく勘どころ",
+      "items": [
+        "一時的な失敗で文字起こしへ落とさない（2.9GiB のモデルを落とす価値がない）",
+        "リトライを外側に重ねない。SDK が既に 5 回待ち直している",
+        "Flash 系は RPD 20 / RPM 5、Flash Lite 系は RPD 500 / RPM 15（実測）"
+      ]
+    }
+  ]
+}
