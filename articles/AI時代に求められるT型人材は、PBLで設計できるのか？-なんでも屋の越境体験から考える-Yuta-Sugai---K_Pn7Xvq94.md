@@ -7,6 +7,7 @@ generated_at: 2026-09-07T01:56:30+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.7-flash
+read_at: 2026-10-05
 ---
 
 # AI時代に求められるT型人材は、PBLで設計できるのか？ なんでも屋の越境体験から考える Yuta Sugai

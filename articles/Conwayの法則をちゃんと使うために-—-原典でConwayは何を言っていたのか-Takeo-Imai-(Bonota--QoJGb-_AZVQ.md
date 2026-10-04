@@ -7,6 +7,7 @@ generated_at: 2026-09-13T02:10:18+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.7-flash
+read_at: 2026-10-05
 ---
 
 # Conwayの法則を"ちゃんと"使うために — 原典でConwayは何を言っていたのか Takeo Imai (Bonotake)

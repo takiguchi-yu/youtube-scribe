@@ -7,6 +7,7 @@ generated_at: 2026-09-06T14:34:15+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.8-flash
+read_at: 2026-10-05
 ---
 
 # 【AI駆動開発カンファレンス 2026 夏】Issue設計から始める仕様駆動開発

@@ -7,6 +7,7 @@ generated_at: 2026-09-06T19:06:33+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.8-flash
+read_at: 2026-10-05
 ---
 
 # Takuto WADA - 2026年のソフトウェアエンジニアリングを考える

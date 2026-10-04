@@ -7,6 +7,7 @@ generated_at: 2026-09-18T01:53:38+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.8-flash
+read_at: 2026-10-05
 ---
 
 # AI自走環境整備・運用スペシャル#6

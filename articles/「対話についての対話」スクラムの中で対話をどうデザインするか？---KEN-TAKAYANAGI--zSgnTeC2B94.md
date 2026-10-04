@@ -7,6 +7,7 @@ generated_at: 2026-09-18T01:46:38+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.8-flash
+read_at: 2026-10-05
 ---
 
 # 「対話についての対話」スクラムの中で対話をどうデザインするか？ - KEN TAKAYANAGI

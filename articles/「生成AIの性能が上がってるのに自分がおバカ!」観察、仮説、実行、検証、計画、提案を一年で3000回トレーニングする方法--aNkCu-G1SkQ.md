@@ -7,6 +7,7 @@ generated_at: 2026-09-27T00:50:11+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.8-flash
+read_at: 2026-10-05
 ---
 
 # 「生成AIの性能が上がってるのに自分がおバカ!」観察、仮説、実行、検証、計画、提案を一年で3000回トレーニングする方法 / Mori Yuya

@@ -7,6 +7,7 @@ generated_at: 2026-09-18T01:50:10+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.8-flash
+read_at: 2026-10-05
 ---
 
 # エンジニアのための自己管理入門 堅牢でスケーラブルな働き方を構築する技術 / 小田中育生

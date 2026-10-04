@@ -7,6 +7,7 @@ generated_at: 2026-09-14T12:04:46+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.5-flash
+read_at: 2026-10-05
 ---
 
 # Claude Code Meetup Japan #7  (Claude Code祭り!)

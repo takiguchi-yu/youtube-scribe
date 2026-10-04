@@ -7,6 +7,7 @@ generated_at: 2026-09-07T04:00:48+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.5-flash
+read_at: 2026-10-05
 ---
 
 # 【AI駆動開発カンファレンス 2026 夏】みずほ証券スタイルのAI駆動開発－ これまでの取り組みと今後のビジョン ー

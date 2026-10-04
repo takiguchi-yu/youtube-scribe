@@ -7,6 +7,7 @@ generated_at: 2026-09-10T06:53:48+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.7-flash
+read_at: 2026-10-05
 ---
 
 # ソフトウェア技術者のための「システム思考」再入門〜複雑な状況の中で考え続けるために〜 Taku Iwamura

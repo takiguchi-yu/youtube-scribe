@@ -7,6 +7,7 @@ generated_at: 2026-09-07T02:06:01+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.7-flash
+read_at: 2026-10-05
 ---
 
 # シニアエンジニアリングリーダーのしごと - Forkwell Library #128

@@ -7,6 +7,7 @@ generated_at: 2026-10-04T15:23:33+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.8-flash
+read_at: 2026-10-05
 ---
 
 # 【#QiitaBash】AI時代のボトルネック、みんなはどう乗り越えてる？

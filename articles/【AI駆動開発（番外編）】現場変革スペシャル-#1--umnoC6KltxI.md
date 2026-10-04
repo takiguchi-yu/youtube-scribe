@@ -7,6 +7,7 @@ generated_at: 2026-09-14T12:02:39+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.5-flash
+read_at: 2026-10-05
 ---
 
 # 【AI駆動開発（番外編）】現場変革スペシャル #1

@@ -7,6 +7,7 @@ generated_at: 2026-09-27T00:47:43+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.8-flash
+read_at: 2026-10-05
 ---
 
 # Future Backwards から予測するAIとアジャイルの姿 / Takeo Imai (Bonotake) / Chiemi Watanabe

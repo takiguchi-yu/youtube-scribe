@@ -7,6 +7,7 @@ generated_at: 2026-09-14T12:08:16+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.5-flash
+read_at: 2026-10-05
 ---
 
 # 実践TanStack Start: 新規プロダクトを開発して確立した、サーバーとクライアント境界の設計パターン / Shimmy - TSKaigi 2026

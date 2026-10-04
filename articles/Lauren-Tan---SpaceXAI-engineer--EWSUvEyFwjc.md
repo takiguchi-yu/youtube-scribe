@@ -7,6 +7,7 @@ generated_at: 2026-09-29T14:12:54+00:00
 source: 自動字幕
 language: "en-orig"
 model: gemini-3.8-flash
+read_at: 2026-10-05
 ---
 
 # Lauren Tan - SpaceXAI engineer

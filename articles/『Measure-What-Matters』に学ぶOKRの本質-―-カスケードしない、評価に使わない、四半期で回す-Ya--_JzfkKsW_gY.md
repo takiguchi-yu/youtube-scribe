@@ -7,6 +7,7 @@ generated_at: 2026-09-18T01:55:16+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.8-flash
+read_at: 2026-10-05
 ---
 
 # 『Measure What Matters』に学ぶOKRの本質 ― カスケードしない、評価に使わない、四半期で回す / Yasunobu Kawaguchi

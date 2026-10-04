@@ -7,6 +7,7 @@ generated_at: 2026-09-27T00:44:17+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.8-flash
+read_at: 2026-10-05
 ---
 
 # 「普通こうですよね？」の声がつらい 〜新人と既存メンバーのすれ違いから考える改善〜 / Hikari Kagenaka

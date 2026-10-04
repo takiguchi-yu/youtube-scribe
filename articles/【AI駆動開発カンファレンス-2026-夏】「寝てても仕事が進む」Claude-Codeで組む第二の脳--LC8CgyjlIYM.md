@@ -7,6 +7,7 @@ generated_at: 2026-09-07T02:12:33+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.7-flash
+read_at: 2026-10-05
 ---
 
 # 【AI駆動開発カンファレンス 2026 夏】「寝てても仕事が進む」Claude Codeで組む第二の脳

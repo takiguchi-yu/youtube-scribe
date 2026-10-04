@@ -7,6 +7,7 @@ generated_at: 2026-09-07T02:03:02+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.7-flash
+read_at: 2026-10-05
 ---
 
 # 開発効率をアップする！ Claude Code 実用入門 - FL#125

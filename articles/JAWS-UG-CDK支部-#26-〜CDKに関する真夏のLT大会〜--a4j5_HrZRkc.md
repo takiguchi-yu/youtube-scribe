@@ -7,6 +7,7 @@ generated_at: 2026-09-10T06:55:42+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.7-flash
+read_at: 2026-10-05
 ---
 
 # JAWS-UG CDK支部 #26 〜CDKに関する真夏のLT大会〜

@@ -7,6 +7,7 @@ generated_at: 2026-09-13T02:12:28+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.7-flash
+read_at: 2026-10-05
 ---
 
 # アウトプットは速くなった。では、チームの学びは速くなったのか？ AI時代の内製スクラムチームで学んだ、価値探索を前に進める問いのデザイン tsuyoshi kaneko

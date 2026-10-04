@@ -7,6 +7,7 @@ generated_at: 2026-09-14T12:06:23+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.5-flash
+read_at: 2026-10-05
 ---
 
 # TypeScriptの「型」をAIのスキルに昇華させてみた件について / higak9 - TSKaigi 2026

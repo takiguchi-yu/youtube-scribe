@@ -7,6 +7,7 @@ generated_at: 2026-09-07T02:04:37+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.7-flash
+read_at: 2026-10-05
 ---
 
 # エンジニアリング戦略の作り方―エンジニアリングの難局を打破する意思決定 - FL#127

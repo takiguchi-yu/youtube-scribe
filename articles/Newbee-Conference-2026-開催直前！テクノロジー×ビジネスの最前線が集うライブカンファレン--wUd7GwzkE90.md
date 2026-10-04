@@ -7,6 +7,7 @@ generated_at: 2026-09-07T01:58:15+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.7-flash
+read_at: 2026-10-05
 ---
 
 # Newbee Conference 2026 開催直前！テクノロジー×ビジネスの最前線が集うライブカンファレンスを見逃せない理由

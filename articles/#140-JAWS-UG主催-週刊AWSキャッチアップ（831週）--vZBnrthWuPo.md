@@ -7,6 +7,7 @@ generated_at: 2026-09-10T06:58:37+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.7-flash
+read_at: 2026-10-05
 ---
 
 # #140 JAWS-UG主催 週刊AWSキャッチアップ（8/31週）

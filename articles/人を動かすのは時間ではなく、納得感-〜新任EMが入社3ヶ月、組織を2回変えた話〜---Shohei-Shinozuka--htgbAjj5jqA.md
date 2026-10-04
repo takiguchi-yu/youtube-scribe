@@ -7,6 +7,7 @@ generated_at: 2026-09-14T11:58:40+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.7-flash
+read_at: 2026-10-05
 ---
 
 # 人を動かすのは時間ではなく、納得感 〜新任EMが入社3ヶ月、組織を2回変えた話〜 - Shohei Shinozuka

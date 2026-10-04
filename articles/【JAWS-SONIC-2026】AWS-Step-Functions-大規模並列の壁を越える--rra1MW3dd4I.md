@@ -7,6 +7,7 @@ generated_at: 2026-10-04T15:27:40+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.8-flash
+read_at: 2026-10-05
 ---
 
 # 【JAWS SONIC 2026】AWS Step Functions 大規模並列の壁を越える

@@ -7,6 +7,7 @@ generated_at: 2026-09-13T02:16:21+00:00
 source: 自動字幕
 language: "ja-orig"
 model: gemini-3.5-flash
+read_at: 2026-10-05
 ---
 
 # チェンジマネジメントキャンバス –– 綺麗事言っても、まわりが変わらないと無理じゃない? - kakeru sarashino ida
