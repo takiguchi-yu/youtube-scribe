@@ -36,10 +36,12 @@
 | `transcript` | 字幕・文字起こしの取り方。3 手段をここで 1 つの形に潰す |
 | `summary` | プロンプトとモデル。**Gemini SDK を import してよいのはここだけ** |
 | `frame` | ffmpeg の呼び方 |
-| `article` | 記事の見た目。**`summary` を import しない**（SDK を引き込まないため）。受け取るのはデータだけ |
+| `article` | 記事の形式（組み立てと front matter の読み書き）。**`summary` を import しない**（SDK を引き込まないため）。受け取るのはデータだけ |
 | `store` | 保存先とファイル名規則、処理済み判定 |
+| `reading` | 何を未読と呼び、どの順で並べ、目次をどう見せるか。**既読は記事の `read_at` だけで決まる** |
 
 依存は `cli` から各モジュールへの一方向。`article` と `store` は互いを知らない。
+両方を使ってよいのは `cli` と `reading` だけ。
 
 ## 変えるときに気をつけること
 

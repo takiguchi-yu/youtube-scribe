@@ -4,6 +4,11 @@
     uv run youtube-scribe "https://www.youtube.com/watch?v=..." --limit 1
     uv run youtube-scribe PL... --dry-run
 
+既読の管理（API キーは要らない）:
+    uv run youtube-scribe unread          まだ読んでいない記事を並べる
+    uv run youtube-scribe read            読み終えた記事を並べる
+    uv run youtube-scribe done 3 dQw4w9WgXcQ   番号か動画ID で既読にする
+
 必要な環境変数:
     YOUTUBE_API_KEY   再生リストと動画メタデータの取得に使う
     GEMINI_API_KEY    要約に使う（SDK が自動で読む）
@@ -23,7 +28,7 @@ from pathlib import Path
 
 import truststore
 
-from youtube_scribe import article, frame, media, playlist, summary, transcript
+from youtube_scribe import article, frame, media, playlist, reading, summary, transcript
 from youtube_scribe.store import ArticleStore
 from youtube_scribe.video import Video
 from youtube_scribe.video import fetch as fetch_videos
@@ -61,6 +66,7 @@ def parse_args(argv: Sequence[str]) -> Args:
     parser = argparse.ArgumentParser(
         prog="youtube-scribe",
         description="YouTube の再生リストから、動画 1 本ごとの学習メモを作る",
+        epilog="既読の管理は youtube-scribe {unread,read,done} -h を参照",
     )
     parser.add_argument("target", help="再生リストの URL/ID、または単体動画の URL")
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT, help="記事の出力先")
@@ -312,6 +318,9 @@ def run(args: Args) -> int:
         if stopped:
             break
 
+    if created:
+        _refresh_index(store)
+
     remaining = len(pending) - created - len(failures) if stopped else 0
     print(
         f"\n作成 {created} 本 / 失敗 {len(failures)} 本"
@@ -322,5 +331,96 @@ def run(args: Args) -> int:
     return 0 if not failures else 1
 
 
+def _refresh_index(store: ArticleStore) -> None:
+    """目次を作り直す。**失敗しても記事づくりの成否は変えない。** 次の機会に作り直される。"""
+    try:
+        reading.write_index(store)
+    except (OSError, ValueError) as error:
+        print(f"目次を作り直せなかった: {error}", file=sys.stderr)
+
+
+# 既読を扱うサブコマンド。**記事を作る側とは引数の形が違う**ので、入口で振り分ける。
+SHELF_COMMANDS = ("unread", "read", "done")
+
+
+@dataclass(frozen=True)
+class ShelfArgs:
+    command: str
+    targets: list[str]
+    out: Path
+
+
+def parse_shelf_args(argv: Sequence[str]) -> ShelfArgs:
+    common = argparse.ArgumentParser(add_help=False)
+    common.add_argument("--out", type=Path, default=DEFAULT_OUT, help="記事の置き場所")
+
+    parser = argparse.ArgumentParser(prog="youtube-scribe", description="記事の既読を管理する")
+    commands = parser.add_subparsers(dest="command", required=True)
+    commands.add_parser(
+        "unread", parents=[common], help="まだ読んでいない記事を、作成日の新しい順に並べる"
+    )
+    commands.add_parser(
+        "read", parents=[common], help="読み終えた記事を、読んだ日の新しい順に並べる"
+    )
+    done = commands.add_parser("done", parents=[common], help="記事を既読にする")
+    done.add_argument("targets", nargs="+", help="unread の番号、または動画ID")
+
+    parsed = parser.parse_args(argv)
+    return ShelfArgs(
+        command=parsed.command,
+        targets=list(getattr(parsed, "targets", [])),
+        out=parsed.out,
+    )
+
+
+def run_shelf(args: ShelfArgs, *, today: datetime.date | None = None) -> int:
+    store = ArticleStore(args.out)
+    try:
+        entries = reading.load(store)
+    except ValueError as error:
+        print(f"記事を読めなかった: {error}", file=sys.stderr)
+        return 1
+
+    if args.command == "unread":
+        queue = reading.unread(entries)
+        if not queue:
+            print(f"全部読み終えている（{len(entries)} 本）")
+            return 0
+        for number, entry in enumerate(queue, start=1):
+            print(f"{number:3d}. {entry.generated_on}  {entry.title}")
+        print(f"\n未読 {len(queue)} 本 / 全 {len(entries)} 本")
+        return 0
+
+    if args.command == "read":
+        done = reading.read(entries)
+        if not done:
+            print("まだ 1 本も読み終えていない")
+            return 0
+        for entry in done:
+            print(f"     {entry.read_at}  {entry.title}")
+        print(f"\n既読 {len(done)} 本 / 全 {len(entries)} 本")
+        return 0
+
+    try:
+        picked = reading.pick(entries, args.targets)
+    except LookupError as error:
+        # **1 つも書かない。** どれが反映されたかを人が追わずに済むように。
+        print(f"{error}。何も既読にしていない", file=sys.stderr)
+        return 1
+    marked = reading.mark_read(store, picked, today or datetime.date.today())
+    for entry in picked:
+        if entry in marked:
+            print(f"既読にした: {entry.title}")
+        else:
+            print(f"既に既読（{entry.read_at}）: {entry.title}")
+    if marked:
+        _refresh_index(store)
+        print("目次を作り直した。GitHub で見るには commit して push する")
+    return 0
+
+
 def main(argv: Sequence[str] | None = None) -> int:
-    return run(parse_args(sys.argv[1:] if argv is None else argv))
+    arguments = list(sys.argv[1:] if argv is None else argv)
+    if arguments and arguments[0] in SHELF_COMMANDS:
+        return run_shelf(parse_shelf_args(arguments))
+    return run(parse_args(arguments))

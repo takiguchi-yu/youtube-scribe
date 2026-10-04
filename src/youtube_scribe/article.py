@@ -1,11 +1,13 @@
-"""記事 — 受け取ったデータを Markdown の文字列にするだけ。
+"""記事 — 受け取ったデータを Markdown の文字列にし、その front matter を読み書きする。
 
 **このモジュールは他のどのモジュールも呼ばない。** 保存先も、要約の作り方も、
-字幕の取り方も知らない。だから記事の見た目を変えたいときは、ここだけを触ればよい。
+字幕の取り方も知らない。だから記事の形式を変えたいときは、ここだけを触ればよい。
+front matter を書くのも読むのもここなので、キーの名前が食い違うことがない。
 """
 
 from __future__ import annotations
 
+import datetime
 import json
 from collections.abc import Mapping, Sequence
 from typing import Protocol
@@ -13,6 +15,11 @@ from typing import Protocol
 from youtube_scribe.frame import Frame
 from youtube_scribe.transcript import Transcript
 from youtube_scribe.video import Video
+
+_FENCE = "---"
+
+# 既読の印。**読んだ日だけを書く。** 所感欄はツールが触らない場所なので使わない。
+READ_AT = "read_at"
 
 
 # Protocol の可変属性は不変（invariant）に扱われるため、`list[Section]` は
@@ -131,3 +138,41 @@ def render(
     # 所感欄は**空のまま置く**。ここを埋めるのは人間の仕事である。
     lines += ["", "## 所感", "", "<!-- ここは自分で書く -->", ""]
     return "\n".join(lines)
+
+
+def _front_matter_end(lines: Sequence[str]) -> int:
+    """front matter を閉じる `---` の行番号。無ければ `ValueError`。"""
+    if not lines or lines[0] != _FENCE:
+        raise ValueError("front matter が無い")
+    for number, line in enumerate(lines[1:], start=1):
+        if line == _FENCE:
+            return number
+    raise ValueError("front matter が閉じていない")
+
+
+def read_front_matter(markdown: str) -> dict[str, str]:
+    """`render` が書いた front matter を読む。
+
+    **YAML 全般は読まない。** `render` が書く形（`key: 値` と、JSON で引用した文字列）
+    だけを受け付ける。読む側と書く側が同じモジュールにあるので、それで足りる。
+    """
+    lines = markdown.split("\n")
+    fields: dict[str, str] = {}
+    for line in lines[1 : _front_matter_end(lines)]:
+        key, separator, value = line.partition(": ")
+        if not separator:
+            continue
+        fields[key] = json.loads(value) if value.startswith('"') else value
+    return fields
+
+
+def mark_read(markdown: str, day: datetime.date) -> str:
+    """front matter に読んだ日を書き足す。**本文には一切触れない。**
+
+    既に読んだ日があれば書き換える。
+    """
+    lines = markdown.split("\n")
+    end = _front_matter_end(lines)
+    stamp = f"{READ_AT}: {day.isoformat()}"
+    kept = [line for line in lines[1:end] if not line.startswith(f"{READ_AT}: ")]
+    return "\n".join([lines[0], *kept, stamp, *lines[end:]])

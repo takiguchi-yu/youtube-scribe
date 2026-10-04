@@ -90,3 +90,28 @@ def test_article_path_is_always_usable(tmp_path: Path, title: str) -> None:
     path = store.save("abcdefghijk", title, "本文")
     assert path.exists()
     assert store.has("abcdefghijk")
+
+
+def test_articles_lists_only_article_files(tmp_path: Path) -> None:
+    store = ArticleStore(tmp_path)
+    store.save("abcdefghijk", "題", "本文")
+    store.save("-bcdefghijk", "先頭が記号の動画ID", "本文")
+    # 目次や手で置いたメモは記事ではない。
+    store.write(store.index_path(), "目次")
+    (tmp_path / "メモ.md").write_text("x", encoding="utf-8")
+    assert sorted(path.name for path in store.articles()) == [
+        "先頭が記号の動画ID---bcdefghijk.md",
+        "題--abcdefghijk.md",
+    ]
+
+
+def test_articles_without_the_directory(tmp_path: Path) -> None:
+    assert ArticleStore(tmp_path / "articles").articles() == []
+
+
+def test_write_replaces_an_existing_article(tmp_path: Path) -> None:
+    store = ArticleStore(tmp_path)
+    path = store.save("abcdefghijk", "題", "本文")
+    store.write(path, "書き換えた")
+    assert path.read_text(encoding="utf-8") == "書き換えた"
+    assert list(tmp_path.glob("*.tmp")) == []

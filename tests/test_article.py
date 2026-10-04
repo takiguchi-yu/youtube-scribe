@@ -4,11 +4,14 @@
 差分を必ず目で見てからコミットすること。
 """
 
+import datetime
 import os
 from dataclasses import dataclass
 from pathlib import Path
 
-from youtube_scribe.article import format_timestamp, render
+import pytest
+
+from youtube_scribe.article import format_timestamp, mark_read, read_front_matter, render
 from youtube_scribe.frame import Frame
 from youtube_scribe.transcript import Cue, Source, Transcript
 from youtube_scribe.video import Chapter, Video
@@ -138,3 +141,32 @@ def test_empty_summary_still_renders() -> None:
     assert "## 詳細" not in produced
     assert "## 用語" not in produced
     assert "## 所感" in produced
+
+
+def test_front_matter_reads_back_what_render_wrote() -> None:
+    fields = read_front_matter(render_sample())
+    assert fields["video_id"] == "dQw4w9WgXcQ"
+    # JSON で引用したタイトルは、引用を外した元の文字列に戻る。
+    assert fields["title"] == 'Rust の "所有権" 入門'
+    assert fields["generated_at"] == "2026-09-06T12:00:00+00:00"
+    assert "read_at" not in fields
+
+
+def test_mark_read_touches_only_the_front_matter() -> None:
+    before = render_sample()
+    after = mark_read(before, datetime.date(2026, 10, 5))
+    assert read_front_matter(after)["read_at"] == "2026-10-05"
+    assert after.split("\n---\n", 1)[1] == before.split("\n---\n", 1)[1]
+
+
+def test_mark_read_twice_keeps_a_single_line() -> None:
+    once = mark_read(render_sample(), datetime.date(2026, 10, 5))
+    twice = mark_read(once, datetime.date(2026, 10, 6))
+    assert twice.count("read_at: ") == 1
+    assert read_front_matter(twice)["read_at"] == "2026-10-06"
+
+
+@pytest.mark.parametrize("broken", ["# 見出しだけ", "---\ntitle: 閉じていない\n"])
+def test_front_matter_must_exist(broken: str) -> None:
+    with pytest.raises(ValueError):
+        read_front_matter(broken)
