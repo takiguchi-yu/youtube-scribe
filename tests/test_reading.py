@@ -126,7 +126,11 @@ def test_index_numbers_unread_like_the_command(store: ArticleStore) -> None:
     assert "未読 2 本 / 全 3 本" in index
     assert "1. 2026-09-20 [新しい記事](" in index
     assert "2. 2026-09-01 [古い記事](" in index
-    assert "- 2026-10-01 [読んだ記事](" in index
+
+
+def test_index_leaves_out_read_articles(store: ArticleStore) -> None:
+    # 既読まで載せると、記事が増えるほど目次が膨らみ続ける。
+    assert "読んだ記事" not in reading.render_index(reading.load(store))
 
 
 def test_index_links_survive_hashes_and_brackets(tmp_path: Path) -> None:
@@ -137,8 +141,13 @@ def test_index_links_survive_hashes_and_brackets(tmp_path: Path) -> None:
     assert "[Lib #124 \\[x\\] (y)](Lib-%23124-%5Bx%5D-%28y%29--aaaaaaaaaaa.md)" in index
 
 
-def test_index_without_articles(tmp_path: Path) -> None:
-    index = reading.render_index([])
-    assert "未読 0 本 / 全 0 本" in index
-    assert "なし" in index
-    assert "まだ無い" in index
+def test_index_when_everything_is_read(tmp_path: Path) -> None:
+    store = ArticleStore(tmp_path)
+    write_article(store, "aaaaaaaaaaa", "読んだ記事", "2026-09-01T12:00:00+00:00", "2026-10-01")
+    index = reading.render_index(reading.load(store))
+    assert "未読 0 本 / 全 1 本" in index
+    assert "全部読み終えている" in index
+
+
+def test_index_without_articles() -> None:
+    assert "未読 0 本 / 全 0 本" in reading.render_index([])

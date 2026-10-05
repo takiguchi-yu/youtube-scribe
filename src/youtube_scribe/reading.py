@@ -1,4 +1,4 @@
-"""既読 — どの記事を読んだか、と、それを並べた目次。
+"""既読 — どの記事を読んだか、と、まだ読んでいない記事を並べた目次。
 
 **既読は記事の front matter にある読んだ日だけで決まる。** 専用の管理ファイルは
 持たない。目次（`articles/README.md`）は記事から毎回作り直す一覧にすぎず、
@@ -127,26 +127,26 @@ def _link(entry: Entry) -> str:
 
 
 def render_index(entries: Sequence[Entry]) -> str:
-    """目次の Markdown。未読を先に、`unread` と同じ番号で並べる。"""
+    """目次の Markdown。未読だけを、`unread` と同じ番号で並べる。
+
+    **既読は載せない。** 載せると記事が増えるほど目次が膨らみ続ける。
+    既読を見たいときは `make read` を使う。
+    """
     queue = unread(entries)
-    done = read(entries)
     lines = [
-        "# 記事の一覧",
+        "# 未読の記事",
         "",
         "<!-- youtube-scribe が記事から作り直す。ここを手で書き換えても次に消える。 -->",
         "",
         f"未読 {len(queue)} 本 / 全 {len(entries)} 本。"
-        "既読にするには `make done N=<番号>`（番号はこの未読の並び。動画ID でもよい）。",
-        "",
-        "## 未読",
+        "既読にするには `make done N=<番号>`（番号はこの並び。動画ID でもよい）。"
+        "既読の記事は `make read` で並べられる。",
         "",
     ]
     lines += [
         f"{number}. {entry.generated_on} {_link(entry)}"
         for number, entry in enumerate(queue, start=1)
-    ] or ["なし"]
-    lines += ["", "## 既読", ""]
-    lines += [f"- {entry.read_at} {_link(entry)}" for entry in done] or ["まだ無い"]
+    ] or ["全部読み終えている。"]
     return "\n".join(lines) + "\n"
 
 
